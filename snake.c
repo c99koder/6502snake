@@ -36,12 +36,14 @@ extern void disableRedbus();
 #define BOARD_X 20
 #define BOARD_Y 20
 
-#define HORIZONTAL_LINE 0
-#define VERTICAL_LINE 1
-#define TOP_LEFT '+'
-#define TOP_RIGHT '+'
-#define BOT_LEFT '+'
-#define BOT_RIGHT '+'
+#define TOP 130
+#define BOT 2
+#define LEFT 1
+#define RIGHT 129
+#define TOP_LEFT 140
+#define TOP_RIGHT 155
+#define BOT_LEFT 156
+#define BOT_RIGHT 158
 #define SNAKE '*'
 #define GEM 'X'
 #endif
@@ -52,13 +54,14 @@ extern void disableRedbus();
 #define YELLOW 7
 #define RED 10
 #define GREEN 13
-//5
 
 #define BOARD_X 38
 #define BOARD_Y 20
 
-#define HORIZONTAL_LINE 'C'
-#define VERTICAL_LINE 'B'
+#define TOP 'C'
+#define BOT 'C'
+#define LEFT 'B'
+#define RIGHT 'B'
 #define TOP_LEFT 'U'
 #define TOP_RIGHT 'I'
 #define BOT_LEFT 'J'
@@ -104,15 +107,15 @@ void redraw() {
 #endif
   cputcxy(0,1,TOP_LEFT);
   for(x=0; x<BOARD_X; x++)
-    cputcxy(x+1,1,HORIZONTAL_LINE);
+    cputcxy(x+1,1,TOP);
   cputcxy(BOARD_X+1,1,TOP_RIGHT);
   for(y=0;y<BOARD_Y;y++) {
-    cputcxy(0,y+2,VERTICAL_LINE);
-    cputcxy(BOARD_X+1,y+2,VERTICAL_LINE);
+    cputcxy(0,y+2,LEFT);
+    cputcxy(BOARD_X+1,y+2,RIGHT);
   }
   cputcxy(0,BOARD_Y+2,BOT_LEFT);
   for(x=0; x<BOARD_X; x++)
-    cputcxy(x+1,BOARD_Y+2,HORIZONTAL_LINE);
+    cputcxy(x+1,BOARD_Y+2,BOT);
   cputcxy(BOARD_X+1,BOARD_Y+2,BOT_RIGHT);
   gotoxy(0, BOARD_Y + 3);
 #ifndef __REDPOWER__
@@ -121,7 +124,7 @@ void redraw() {
 #ifdef __C64__
   cputs("snakegame v0.02\n\r(c) 2003 sam steele");
 #else
-  cputs("SnakeGame v0.02\n\r(C) 2003 Sam Steele");
+  cputs("SnakeGame v0.02\n(C) 2003 Sam Steele");
 #endif
 }
 
