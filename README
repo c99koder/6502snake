@@ -1,0 +1,5 @@
+Snake
+=====
+
+A snake game for 6502-based computers such as the RedPower computer
+in Minecraft that can be compiled with the cc65 C compiler.
