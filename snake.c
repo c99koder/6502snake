@@ -46,6 +46,8 @@ extern void disableRedbus();
 #define BOT_RIGHT 158
 #define SNAKE '*'
 #define GEM 'X'
+
+#define kbhit() ( PEEK(0x304) != PEEK(0x305) )
 #endif
 
 #ifdef __C64__
