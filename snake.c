@@ -26,10 +26,46 @@ extern void setMappedRedbusDevice(unsigned char);
 extern unsigned getMappedRedbusDevice();
 extern void enableRedbus();
 extern void disableRedbus();
-#endif
+
+#define BLACK 0
+#define WHITE 0
+#define YELLOW 0
+#define RED 0
+#define GREEN 0
 
 #define BOARD_X 20
 #define BOARD_Y 20
+
+#define HORIZONTAL_LINE 0
+#define VERTICAL_LINE 1
+#define TOP_LEFT '+'
+#define TOP_RIGHT '+'
+#define BOT_LEFT '+'
+#define BOT_RIGHT '+'
+#define SNAKE '*'
+#define GEM 'X'
+#endif
+
+#ifdef __C64__
+#define BLACK 0
+#define WHITE 1
+#define YELLOW 7
+#define RED 10
+#define GREEN 13
+//5
+
+#define BOARD_X 38
+#define BOARD_Y 20
+
+#define HORIZONTAL_LINE 'C'
+#define VERTICAL_LINE 'B'
+#define TOP_LEFT 'U'
+#define TOP_RIGHT 'I'
+#define BOT_LEFT 'J'
+#define BOT_RIGHT 'K'
+#define SNAKE 'Q'
+#define GEM 'Z'
+#endif
 
 char board[BOARD_X][BOARD_Y];
 
@@ -39,33 +75,54 @@ unsigned char ssize,sscore,slives;
 void redraw() {
   char scorebuf[10],x,y;
   clrscr();
-  //color(1,0);
+#ifndef __REDPOWER__
+  textcolor(WHITE);
+#endif
+#ifdef __C64__
+  cputs("score: ");
+#else
   cputs("Score: ");
+#endif
   itoa(sscore, scorebuf, 10);
   cputs(scorebuf);
   gotoxy(BOARD_X - 6,0);
+#ifndef __REDPOWER__
   if(dead==0) {
+#endif
+#ifdef __C64__
+    cputs("lives: ");
+#else
     cputs("Lives: ");
+#endif
     itoa(slives, scorebuf, 10);
     cputs(scorebuf);
+#ifndef __REDPOWER__
   }
-  //color(7,0); //yellow on black
-  cputcxy(0,1,'+');
+#endif
+#ifndef __REDPOWER__
+  textcolor(YELLOW);
+#endif
+  cputcxy(0,1,TOP_LEFT);
   for(x=0; x<BOARD_X; x++)
-    cputcxy(x+1,1,'-');
-  cputcxy(BOARD_X+1,1,'+');
+    cputcxy(x+1,1,HORIZONTAL_LINE);
+  cputcxy(BOARD_X+1,1,TOP_RIGHT);
   for(y=0;y<BOARD_Y;y++) {
-    //color(7,0); //yellow on black
-    cputcxy(0,y+2,'|');
-    cputcxy(BOARD_X+1,y+2,'|');
+    cputcxy(0,y+2,VERTICAL_LINE);
+    cputcxy(BOARD_X+1,y+2,VERTICAL_LINE);
   }
-  cputcxy(0,BOARD_Y+2,'+');
+  cputcxy(0,BOARD_Y+2,BOT_LEFT);
   for(x=0; x<BOARD_X; x++)
-    cputcxy(x+1,BOARD_Y+2,'-');
-  cputcxy(BOARD_X+1,BOARD_Y+2,'+');
+    cputcxy(x+1,BOARD_Y+2,HORIZONTAL_LINE);
+  cputcxy(BOARD_X+1,BOARD_Y+2,BOT_RIGHT);
   gotoxy(0, BOARD_Y + 3);
+#ifndef __REDPOWER__
+  textcolor(WHITE);
+#endif
+#ifdef __C64__
+  cputs("snakegame v0.02\n\r(c) 2003 sam steele");
+#else
   cputs("SnakeGame v0.02\n\r(C) 2003 Sam Steele");
-  
+#endif
 }
 
 int main() {
@@ -87,13 +144,21 @@ int main() {
 #ifdef __REDPOWER__
 	enableRedbus();
 	setMappedRedbusDevice(1);
+#else
+  bgcolor(BLACK);
+  bordercolor(YELLOW);
 #endif
   cursor(0);
 
+#ifdef __C64__
+  POKE(53272,21);
+#endif
+
   //initialize the board
-  for(x=0;x<BOARD_X;x++) {
-    for(y=0;y<BOARD_Y;y++) {
-      board[x][y]=0;
+  for(x=0;x<BOARD_X;++x) {
+    b1 = board[x];
+    for(y=0;y<BOARD_Y;++y) {
+      b1[y]=0;
     }
   }
 
@@ -107,24 +172,33 @@ int main() {
   x=rand()%BOARD_X;
   y=rand()%BOARD_Y;
   board[x][y]=255;
-  cputcxy(x+1, y+2, 'X');
+#ifndef __REDPOWER__
+  textcolor(RED);
+#endif
+  cputcxy(x+1, y+2, GEM);
 
   go = 1;
 
   while(go==1) {
+#ifndef __REDPOWER__
     if(dead == 0) {
+#endif
       //move head
       sx+=sdx;
       sy+=sdy;
-      cputcxy(sx+1,sy+2,'*');
+#ifndef __REDPOWER__
+      textcolor(GREEN);
+#endif
+      cputcxy(sx+1,sy+2,SNAKE);
 
       //check bounds
       if(sx>=BOARD_X || sx<0 || sy>=BOARD_Y || sy<0) { 
         slives--; 
         ssize=3; 
         for(x=0;x<BOARD_X;++x) {
+          b1 = board[x];
           for(y=0;y<BOARD_Y;++y) {
-            board[x][y]=0;
+            b1[y]=0;
           }
         }
         redraw();
@@ -133,7 +207,10 @@ int main() {
         x=rand()%BOARD_X;
         y=rand()%BOARD_Y;
         board[x][y]=255;
-        cputcxy(x+1, y+2, 'X');
+#ifndef __REDPOWER__
+        textcolor(RED);
+#endif
+        cputcxy(x+1, y+2, GEM);
       }
 
       //check collisions
@@ -145,7 +222,10 @@ int main() {
             x=rand()%BOARD_X; y=rand()%BOARD_Y;
           } while(board[x][y]!=0);
           board[x][y]=255;
-          cputcxy(x+1, y+2, 'X');
+#ifndef __REDPOWER__
+          textcolor(RED);
+#endif
+          cputcxy(x+1, y+2, GEM);
           //make the stretch work correctly
           for(x=0;x<BOARD_X;++x) {
             b1 = board[x];
@@ -157,8 +237,9 @@ int main() {
           slives--; 
           ssize=3; 
           for(x=0;x<BOARD_X;++x) {
+            b1 = board[x];
             for(y=0;y<BOARD_Y;++y) {
-              board[x][y]=0;
+              b1[y]=0;
             }
           }
           redraw();
@@ -167,10 +248,15 @@ int main() {
           x=rand()%BOARD_X;
           y=rand()%BOARD_Y;
           board[x][y]=255;
-          cputcxy(x+1, y+2, 'X');
+#ifndef __REDPOWER__
+          textcolor(RED);
+#endif
+          cputcxy(x+1, y+2, GEM);
         }
       }
+#ifndef __REDPOWER__
       if(slives<=0) dead=1;
+#endif
       board[sx][sy]=ssize+1;
 
       //decrement the array (simulates motion)
@@ -184,28 +270,55 @@ int main() {
           }
         }
       }
+#ifndef __REDPOWER__
     }
+#endif
     //render the screen
     gotoxy(0,0);
-    //color(1,0);
+#ifndef __REDPOWER__
+    textcolor(WHITE);
+#endif
+#ifdef __C64__
+    cputs("score: ");
+#else
     cputs("Score: ");
+#endif
     itoa(sscore, scorebuf, 10);
     cputs(scorebuf);
-    cputs("\n");
     gotoxy(BOARD_X - 6,0);
+#ifndef __REDPOWER__
     if(dead==0) {
+#endif
+#ifdef __C64__
+      cputs("lives: ");
+#else
       cputs("Lives: ");
+#endif
       itoa(slives, scorebuf, 10);
       cputs(scorebuf);
+#ifndef __REDPOWER__
 	  }
     if(dead==1) {
-      //color(2,0);
-      gotoxy((BOARD_X/2) - 4,12); cputs("You Died!");
-      gotoxy((BOARD_X/2) - 4,13); cputs("Press ESC");
+#ifndef __REDPOWER__
+      textcolor(RED);
+#endif
+#ifdef __C64__
+      gotoxy((BOARD_X/2) - 4,11); cputs("you died!");
+      gotoxy((BOARD_X/2) - 5,12); cputs("press space");
+#else
+      gotoxy((BOARD_X/2) - 4,11); cputs("You Died!");
+      gotoxy((BOARD_X/2) - 5,12); cputs("Press SPACE");
+#endif
     }
     for(x=0;x<6;--x) { //we do this 6 times so that we can poll the keyboard 6 times more than we move the snake on screen
+#endif
       if(kbhit()) {
         switch(cgetc()) {
+        case 'p':
+          do {
+            //
+          } while(!kbhit());
+          break;
         case 'w':
           if(sdy==0) {
             sdx=0;
@@ -230,12 +343,14 @@ int main() {
             sdy=0;
           }
           break;
-        case 27:
+        case ' ':
           go=0;
           break;
         }
       }
+#ifndef __REDPOWER__
     }
+#endif
   }
   return 0;
 }  
